@@ -26,7 +26,7 @@ function setSaveStatus(status, text) {
   const el = $('save-indicator');
   if (!el) return;
   el.className = `save-indicator ${status}`;
-  el.innerHTML = `<span class="dot"></span>${text}`;
+  el.innerHTML = `<span class="dot"></span><span class="save-text">${text}</span>`;
 }
 
 // ─── Autosave ─────────────────────────────────────────

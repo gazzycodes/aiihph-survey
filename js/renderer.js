@@ -110,9 +110,10 @@ function renderTable(q) {
   const cols = q.columns || [];
   const addLabel = tPlain(q.addRowLabel) || '+ Add Row';
 
+  // Desktop view header cells
   const headerCells = cols.map(c => `<th>${t(c.label)}</th>`).join('') + '<th></th>';
 
-  const renderRow = (row, idx) => {
+  const renderDesktopRow = (row, idx) => {
     const cells = cols.map(c => {
       const cellVal = row[c.key] ?? '';
       let input;
@@ -131,13 +132,54 @@ function renderTable(q) {
     return `<tr data-row-idx="${idx}">${cells}<td><button type="button" class="table-del-btn" data-table="${q.id}" data-row="${idx}" title="Remove row">✕</button></td></tr>`;
   };
 
-  const bodyRows = rows.map((row, i) => renderRow(row, i)).join('');
+  const renderMobileCard = (row, idx) => {
+    const fields = cols.map(c => {
+      const cellVal = row[c.key] ?? '';
+      let input;
+      if (c.type === 'select') {
+        const copts = (c.options || []).map(o =>
+          `<option value="${escHtml(o.value)}" ${cellVal === o.value ? 'selected' : ''}>${escHtml(tPlain(o.label))}</option>`
+        ).join('');
+        input = `<select class="table-cell-input" data-table="${q.id}" data-row="${idx}" data-col="${c.key}"><option value="">-- Select --</option>${copts}</select>`;
+      } else if (c.type === 'number') {
+        input = `<input type="number" class="table-cell-input" data-table="${q.id}" data-row="${idx}" data-col="${c.key}" value="${escHtml(String(cellVal))}" inputmode="numeric" placeholder="0">`;
+      } else {
+        input = `<input type="text" class="table-cell-input" data-table="${q.id}" data-row="${idx}" data-col="${c.key}" value="${escHtml(cellVal)}" placeholder="Type here...">`;
+      }
+      return `<div class="table-card-field">
+        <label class="table-card-field-label">${t(c.label)}</label>
+        <div class="table-card-field-input-wrapper">${input}</div>
+      </div>`;
+    }).join('');
 
-  return `<div class="table-wrapper">
-    <table class="survey-table" id="f_${q.id}">
-      <thead><tr>${headerCells}</tr></thead>
-      <tbody>${bodyRows}</tbody>
-    </table>
+    return `<div class="table-row-card" data-row-idx="${idx}">
+      <div class="table-row-card-header">
+        <span class="table-row-card-title">Entry #${idx + 1}</span>
+        <button type="button" class="table-row-card-del-btn" data-table="${q.id}" data-row="${idx}" title="Remove entry">✕ Remove</button>
+      </div>
+      <div class="table-row-card-body">
+        ${fields}
+      </div>
+    </div>`;
+  };
+
+  const desktopRows = rows.map((row, i) => renderDesktopRow(row, i)).join('');
+  const mobileCards = rows.map((row, i) => renderMobileCard(row, i)).join('');
+
+  return `<div class="table-section-wrapper" id="f_${q.id}">
+    <!-- Desktop Table View -->
+    <div class="table-desktop-view">
+      <table class="survey-table">
+        <thead><tr>${headerCells}</tr></thead>
+        <tbody>${desktopRows}</tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="table-mobile-view">
+      ${mobileCards}
+    </div>
+
     <button type="button" class="add-row-btn" data-table="${q.id}" data-columns='${JSON.stringify(cols.map(c=>c.key))}'>
       + ${addLabel}
     </button>
@@ -264,7 +306,7 @@ function attachEvents(container, questions) {
 
   // Table delete row
   container.addEventListener('click', e => {
-    const btn = e.target.closest('.table-del-btn');
+    const btn = e.target.closest('.table-del-btn') || e.target.closest('.table-row-card-del-btn');
     if (!btn) return;
     const tableId = btn.dataset.table;
     const rowIdx = +btn.dataset.row;
@@ -284,33 +326,70 @@ function updateTableCell(tableId, rowIdx, colKey, value) {
 }
 
 function rerenderTable(container, tableId, rows, q) {
-  const table = container.querySelector(`#f_${tableId}`);
-  if (!table) return;
-  const tbody = table.querySelector('tbody');
-  if (!tbody) return;
+  const wrapper = container.querySelector(`#f_${tableId}`);
+  if (!wrapper) return;
   const cols = q?.columns || [];
 
-  tbody.innerHTML = rows.map((row, idx) => {
-    const cells = cols.map(c => {
-      const cellVal = row[c.key] ?? '';
-      let input;
-      if (c.type === 'select') {
-        const copts = (c.options || []).map(o =>
-          `<option value="${escHtml(o.value)}" ${cellVal === o.value ? 'selected' : ''}>${escHtml(tPlain(o.label))}</option>`
-        ).join('');
-        input = `<select class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}"><option value="">-</option>${copts}</select>`;
-      } else if (c.type === 'number') {
-        input = `<input type="number" class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}" value="${escHtml(String(cellVal))}" inputmode="numeric">`;
-      } else {
-        input = `<input type="text" class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}" value="${escHtml(cellVal)}">`;
-      }
-      return `<td>${input}</td>`;
+  // Update desktop table body
+  const tbody = wrapper.querySelector('.table-desktop-view tbody');
+  if (tbody) {
+    tbody.innerHTML = rows.map((row, idx) => {
+      const cells = cols.map(c => {
+        const cellVal = row[c.key] ?? '';
+        let input;
+        if (c.type === 'select') {
+          const copts = (c.options || []).map(o =>
+            `<option value="${escHtml(o.value)}" ${cellVal === o.value ? 'selected' : ''}>${escHtml(tPlain(o.label))}</option>`
+          ).join('');
+          input = `<select class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}"><option value="">-</option>${copts}</select>`;
+        } else if (c.type === 'number') {
+          input = `<input type="number" class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}" value="${escHtml(String(cellVal))}" inputmode="numeric">`;
+        } else {
+          input = `<input type="text" class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}" value="${escHtml(cellVal)}">`;
+        }
+        return `<td>${input}</td>`;
+      }).join('');
+      return `<tr data-row-idx="${idx}">${cells}<td><button type="button" class="table-del-btn" data-table="${tableId}" data-row="${idx}" title="Remove row">✕</button></td></tr>`;
     }).join('');
-    return `<tr data-row-idx="${idx}">${cells}<td><button type="button" class="table-del-btn" data-table="${tableId}" data-row="${idx}" title="Remove row">✕</button></td></tr>`;
-  }).join('');
+  }
 
-  // Reattach cell events
-  tbody.querySelectorAll('.table-cell-input').forEach(inp => {
+  // Update mobile cards view
+  const mobileView = wrapper.querySelector('.table-mobile-view');
+  if (mobileView) {
+    mobileView.innerHTML = rows.map((row, idx) => {
+      const fields = cols.map(c => {
+        const cellVal = row[c.key] ?? '';
+        let input;
+        if (c.type === 'select') {
+          const copts = (c.options || []).map(o =>
+            `<option value="${escHtml(o.value)}" ${cellVal === o.value ? 'selected' : ''}>${escHtml(tPlain(o.label))}</option>`
+          ).join('');
+          input = `<select class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}"><option value="">-- Select --</option>${copts}</select>`;
+        } else if (c.type === 'number') {
+          input = `<input type="number" class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}" value="${escHtml(String(cellVal))}" inputmode="numeric" placeholder="0">`;
+        } else {
+          input = `<input type="text" class="table-cell-input" data-table="${tableId}" data-row="${idx}" data-col="${c.key}" value="${escHtml(cellVal)}" placeholder="Type here...">`;
+        }
+        return `<div class="table-card-field">
+          <label class="table-card-field-label">${t(c.label)}</label>
+          <div class="table-card-field-input-wrapper">${input}</div>
+        </div>`;
+      }).join('');
+
+      return `<div class="table-row-card" data-row-idx="${idx}">
+        <div class="table-row-card-header">
+          <span class="table-row-card-title">Entry #${idx + 1}</span>
+          <button type="button" class="table-row-card-del-btn" data-table="${tableId}" data-row="${idx}" title="Remove entry">✕ Remove</button>
+        </div>
+        <div class="table-row-card-body">
+          ${fields}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Reattach cell events for both views
+  wrapper.querySelectorAll('.table-cell-input').forEach(inp => {
     inp.addEventListener('input', () => {
       updateTableCell(inp.dataset.table, +inp.dataset.row, inp.dataset.col, inp.value);
     });

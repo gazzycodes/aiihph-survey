@@ -713,20 +713,20 @@ body.lang-bn .lang-hi { display: none; }
 .survey-table tr:last-child td { border-bottom: none; }
 .table-cell-input {
   width: 100%;
-  background: transparent;
-  border: 1px solid transparent;
+  background: var(--bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: var(--font-base);
   font-size: var(--font-size-sm);
-  padding: 6px 8px;
+  padding: 8px 10px;
   outline: none;
   transition: border-color var(--transition-fast), background var(--transition-fast);
-  min-width: 80px;
+  min-width: 100px;
 }
 .table-cell-input:focus {
   border-color: var(--accent);
-  background: var(--bg-input);
+  background: rgba(255,255,255,0.06);
 }
 .table-del-btn {
   background: transparent;
@@ -1014,11 +1014,158 @@ body.lang-bn .lang-hi { display: none; }
 .gap-sm { gap: var(--space-sm); }
 .w-full { width: 100%; }
 
-/* ---- Responsive ---- */
-@media (max-width: 360px) {
-  .deck-grid { grid-template-columns: 1fr; }
-  h1 { font-size: var(--font-size-xl); }
+/* ---- Responsive & Mobile Optimization ---- */
+
+/* Table responsive views */
+.table-desktop-view { display: block; }
+.table-mobile-view { display: none; }
+
+.table-section-wrapper {
+  margin-top: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
+
+.table-wrapper {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+/* Mobile Table Row Cards */
+.table-row-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.table-row-card-header {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+}
+.table-row-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+.table-row-card-del-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--error);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-base);
+  transition: all var(--transition-fast);
+}
+.table-row-card-del-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+.table-row-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.table-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.table-card-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.table-card-field-input-wrapper select,
+.table-card-field-input-wrapper input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 10px var(--space-sm);
+  outline: none;
+  font-family: var(--font-base);
+  font-size: var(--font-size-md);
+  transition: border-color var(--transition-fast);
+}
+.table-card-field-input-wrapper select:focus,
+.table-card-field-input-wrapper input:focus {
+  border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .table-desktop-view { display: none; }
+  .table-mobile-view { display: block; }
+}
+
+@media (max-width: 500px) {
+  .app-header {
+    padding: 0 var(--space-sm);
+    gap: var(--space-sm);
+    height: 60px;
+  }
+  .header-logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  .header-title {
+    font-size: 13px;
+  }
+  .header-subtitle {
+    display: none;
+  }
+  .save-indicator {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+  .save-indicator.saved .save-text {
+    display: none; /* Hide 'Saved HH:MM' text on mobile, just keep green pulse dot */
+  }
+  .lang-switcher {
+    gap: 1px;
+    padding: 1px;
+  }
+  .lang-btn {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .screen {
+    padding: var(--space-sm);
+    padding-bottom: 90px;
+  }
+  .question-card {
+    padding: var(--space-md) var(--space-sm);
+  }
+  .pill-btn {
+    padding: 8px 12px;
+    font-size: var(--font-size-sm);
+  }
+  .deck-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+  .modal {
+    padding: var(--space-md) var(--space-sm);
+  }
+}
+
 @media (min-width: 640px) {
   .screen { padding: var(--space-xl); }
   .modal { border-radius: var(--radius-xl); margin: auto; }

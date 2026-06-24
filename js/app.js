@@ -476,8 +476,9 @@ async function init() {
 
   // Confirm dialog
   $('confirm-yes')?.addEventListener('click', async () => {
+    const cb = confirmCallback;
     closeConfirm();
-    if (confirmCallback) await confirmCallback();
+    if (cb) await cb();
   });
   $('confirm-no')?.addEventListener('click', closeConfirm);
   $('confirm-overlay')?.addEventListener('click', e => {

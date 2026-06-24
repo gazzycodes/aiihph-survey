@@ -1017,7 +1017,15 @@ body.lang-bn .lang-hi { display: none; }
 /* ---- Responsive & Mobile Optimization ---- */
 
 /* Table responsive views */
-.table-desktop-view { display: block; }
+.table-desktop-view {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.01);
+  width: 100%;
+}
 .table-mobile-view { display: none; }
 
 .table-section-wrapper {

@@ -3,7 +3,7 @@
  * Caches all assets on install. Serves from cache first, network fallback.
  */
 
-const CACHE_NAME = 'vhs-v8';
+const CACHE_NAME = 'vhs-v9';
 const ASSETS = [
   '/',
   '/index.html',

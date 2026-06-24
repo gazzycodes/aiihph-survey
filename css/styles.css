@@ -981,6 +981,20 @@ body.lang-bn .lang-hi { display: none; }
   transition: all var(--transition-fast);
 }
 .btn-danger:hover { background: rgba(239,68,68,0.25); }
+.btn-danger-link {
+  background: transparent;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: 8px 16px;
+  transition: opacity var(--transition-fast);
+  font-family: var(--font-base);
+}
+.btn-danger-link:hover {
+  opacity: 0.8;
+}
 .confirm-cancel { flex: 1; }
 
 /* ---- Scrollbar ---- */

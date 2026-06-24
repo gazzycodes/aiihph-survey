@@ -289,9 +289,11 @@ function closeExportModal() {
 
 // ─── Confirm Dialog ────────────────────────────────────
 let confirmCallback = null;
-function showConfirm(title, desc, onConfirm) {
+function showConfirm(title, desc, onConfirm, yesText = 'Delete') {
   $('confirm-title').textContent = title;
   $('confirm-desc').textContent = desc;
+  const yesBtn = $('confirm-yes');
+  if (yesBtn) yesBtn.textContent = yesText;
   confirmCallback = onConfirm;
   $('confirm-overlay').classList.add('open');
 }
@@ -456,6 +458,20 @@ async function init() {
   $('btn-manual-save')?.addEventListener('click', async () => {
     await autoSave();
     showToast('Saved!', 'success');
+  });
+
+  // Reset App
+  $('btn-reset-app')?.addEventListener('click', () => {
+    showConfirm(
+      'Reset Survey Tool?',
+      'This will permanently delete all families, answers, and settings from this device. Make sure you have exported your data first!',
+      async () => {
+        await Storage.clearAll();
+        showToast('App reset successfully! Reloading...', 'success');
+        setTimeout(() => window.location.reload(), 1200);
+      },
+      'Reset All'
+    );
   });
 
   // Confirm dialog

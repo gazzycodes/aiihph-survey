@@ -146,6 +146,23 @@ const Storage = {
     await idbDelete(id);
   },
 
+  async clearAll() {
+    localStorage.removeItem(LS_KEY);
+    try {
+      const d = await openDB();
+      if (d) {
+        return new Promise((resolve) => {
+          const tx = d.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).clear();
+          tx.oncomplete = resolve;
+          tx.onerror = () => resolve();
+        });
+      }
+    } catch (e) {
+      console.warn('IDB clear failed:', e);
+    }
+  },
+
   // Sync in-memory data to both stores (called on every significant change)
   async sync(familyData) {
     return this.save(familyData);

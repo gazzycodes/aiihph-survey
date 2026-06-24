@@ -276,7 +276,7 @@ function updateDeckNav() {
 
 function updateHeaderTitle(name) {
   const el = $('header-title');
-  if (el) el.textContent = name || 'Vishu Health Survey';
+  if (el) el.textContent = name || 'AIIH&PH Health Survey';
 }
 
 // ─── Modal (Export) ────────────────────────────────────
@@ -376,7 +376,7 @@ async function init() {
     allFamilies = await Storage.loadAll();
     renderFamilyList();
     showScreen('screen-families');
-    updateHeaderTitle('Vishu Health Survey');
+    updateHeaderTitle('AIIH&PH Health Survey');
   });
 
   // Back to decks from survey
@@ -391,7 +391,7 @@ async function init() {
     allFamilies = await Storage.loadAll();
     renderFamilyList();
     showScreen('screen-families');
-    updateHeaderTitle('Vishu Health Survey');
+    updateHeaderTitle('AIIH&PH Health Survey');
   });
 
   // Deck nav

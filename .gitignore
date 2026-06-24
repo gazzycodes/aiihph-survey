@@ -1,0 +1,10 @@
+# Local agent logs and settings
+.system_generated/
+.agents/
+.gemini/
+*.log
+tmp/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

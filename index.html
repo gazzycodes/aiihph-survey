@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Trilingual community health survey tool for AIIH&PH field visits — English, Hindi, Bengali">
+  <title>Vishu Health Survey</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ════════════════════════════════════
+       HEADER (always visible)
+  ════════════════════════════════════ -->
+  <header class="app-header">
+    <div class="header-logo">
+      <div class="header-logo-icon">🏥</div>
+      <div>
+        <div class="header-title" id="header-title">Vishu Health Survey</div>
+        <div class="header-subtitle">AIIH&PH · Field Survey Tool</div>
+      </div>
+    </div>
+
+    <!-- Save indicator -->
+    <div class="save-indicator saved" id="save-indicator">
+      <span class="dot"></span>Ready
+    </div>
+
+    <!-- Language switcher -->
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="all" title="All languages">3L</button>
+      <button class="lang-btn" data-lang="en" title="English only">EN</button>
+      <button class="lang-btn" data-lang="hi" title="Hindi only">हि</button>
+      <button class="lang-btn" data-lang="bn" title="Bengali only">বা</button>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════
+       SCREEN 1: FAMILY MANAGER
+  ════════════════════════════════════ -->
+  <section id="screen-families" class="screen active">
+    <h1 class="screen-title">Families</h1>
+    <p class="screen-subtitle">Select a family to survey, or add a new one.</p>
+
+    <div id="family-list" class="family-list">
+      <!-- Rendered by JS -->
+    </div>
+
+    <button class="btn-primary" id="btn-new-family">
+      ＋ Add New Family
+    </button>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 2: DECK SELECTOR
+  ════════════════════════════════════ -->
+  <section id="screen-decks" class="screen">
+    <div class="breadcrumb">
+      <button class="breadcrumb-link" id="btn-decks-back">← Families</button>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current" id="breadcrumb-family-name">Family</span>
+    </div>
+
+    <h2 class="screen-title">Survey Decks</h2>
+    <p class="screen-subtitle">Tap a deck to begin. Fill in what you can, skip what's not applicable.</p>
+
+    <div class="deck-grid" id="deck-grid">
+      <!-- Rendered by JS -->
+    </div>
+
+    <div style="margin-top: 20px; display:flex; gap: 10px;">
+      <button class="btn-secondary" id="btn-manual-save" style="flex:1">
+        💾 Save Now
+      </button>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 3: SURVEY FORM
+  ════════════════════════════════════ -->
+  <section id="screen-survey" class="screen">
+    <div class="breadcrumb">
+      <button class="breadcrumb-link" id="btn-back-families">← Families</button>
+      <span class="breadcrumb-sep">›</span>
+      <button class="breadcrumb-link" id="btn-back-decks">Decks</button>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current" id="breadcrumb-deck-name">Deck</span>
+    </div>
+
+    <!-- Deck Header -->
+    <div class="deck-header">
+      <div class="deck-header-badge" id="deck-header-badge">📋</div>
+      <div class="deck-header-info">
+        <div class="deck-header-title" id="deck-header-title">Loading…</div>
+        <div class="deck-header-subtitle" id="deck-header-subtitle"></div>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div id="survey-form-container">
+      <!-- Dynamically rendered by renderer.js -->
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       DECK NAVIGATION (fixed bottom bar)
+  ════════════════════════════════════ -->
+  <nav class="deck-nav hidden" id="deck-nav">
+    <button class="nav-btn" id="nav-prev" disabled>← Prev</button>
+    <div class="nav-progress">
+      <span id="nav-progress-text">Deck 1 of 10</span>
+      <div class="nav-progress-dots" id="nav-dots"></div>
+    </div>
+    <button class="nav-btn" id="nav-next">Next →</button>
+  </nav>
+
+  <!-- ════════════════════════════════════
+       FLOATING ACTION BUTTON (Export)
+  ════════════════════════════════════ -->
+  <button class="fab" id="fab-export" title="Export data">
+    ⬇
+  </button>
+
+  <!-- ════════════════════════════════════
+       MODAL: EXPORT
+  ════════════════════════════════════ -->
+  <div class="modal-overlay" id="export-modal-overlay">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">📤 Export Data</div>
+      <p class="text-muted text-sm" style="margin-bottom:16px">
+        Downloads a file to your device. Works offline. Data is never sent anywhere.
+      </p>
+      <div class="modal-actions">
+        <button class="modal-action-btn" id="btn-export-json">
+          <div class="modal-action-icon" style="background:rgba(45,212,191,0.15)">📄</div>
+          <div class="modal-action-info">
+            <div class="modal-action-title">Export This Family — JSON</div>
+            <div class="modal-action-desc">Best for re-importing or full data backup</div>
+          </div>
+        </button>
+        <button class="modal-action-btn" id="btn-export-csv">
+          <div class="modal-action-icon" style="background:rgba(96,165,250,0.15)">📊</div>
+          <div class="modal-action-info">
+            <div class="modal-action-title">Export This Family — CSV</div>
+            <div class="modal-action-desc">Open in Excel / Google Sheets</div>
+          </div>
+        </button>
+        <button class="modal-action-btn" id="btn-export-html">
+          <div class="modal-action-icon" style="background:rgba(239,68,68,0.15)">📋</div>
+          <div class="modal-action-info">
+            <div class="modal-action-title">Export This Family — Printable Report (HTML)</div>
+            <div class="modal-action-desc">Formatted trilingual report, ready to print/PDF</div>
+          </div>
+        </button>
+        <button class="modal-action-btn" id="btn-export-all-json">
+          <div class="modal-action-icon" style="background:rgba(167,139,250,0.15)">🗂️</div>
+          <div class="modal-action-info">
+            <div class="modal-action-title">Export ALL Families — JSON</div>
+            <div class="modal-action-desc">Complete backup of all survey data</div>
+          </div>
+        </button>
+        <button class="modal-action-btn" id="btn-export-all-csv">
+          <div class="modal-action-icon" style="background:rgba(251,146,60,0.15)">📋</div>
+          <div class="modal-action-info">
+            <div class="modal-action-title">Export ALL Families — CSV</div>
+            <div class="modal-action-desc">All families in one spreadsheet</div>
+          </div>
+        </button>
+        <button class="modal-action-btn" id="btn-export-all-html">
+          <div class="modal-action-icon" style="background:rgba(245,158,11,0.15)">📚</div>
+          <div class="modal-action-info">
+            <div class="modal-action-title">Export ALL Families — Printable Report (HTML)</div>
+            <div class="modal-action-desc">All families combined with page breaks for printing</div>
+          </div>
+        </button>
+      </div>
+      <button class="btn-secondary modal-close" id="close-export-modal">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       MODAL: NEW FAMILY
+  ════════════════════════════════════ -->
+  <div class="modal-overlay" id="new-family-modal-overlay">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">👨‍👩‍👧‍👦 New Family</div>
+      <p class="text-muted text-sm" style="margin-bottom:16px">
+        Enter the family name or head of family name to identify this survey record.
+      </p>
+      <input
+        type="text"
+        class="modal-input"
+        id="new-family-name"
+        placeholder="e.g. Sharma Family / Mondal Bari"
+        maxlength="60"
+        autocomplete="off"
+      >
+      <div style="display:flex;gap:10px">
+        <button class="btn-secondary confirm-cancel" id="cancel-new-family">Cancel</button>
+        <button class="btn-primary" id="confirm-new-family" style="flex:2">Create Family →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       CONFIRM DIALOG
+  ════════════════════════════════════ -->
+  <div class="modal-overlay" id="confirm-overlay">
+    <div class="modal confirm-dialog">
+      <div class="modal-handle"></div>
+      <div class="confirm-title" id="confirm-title">Are you sure?</div>
+      <div class="confirm-desc" id="confirm-desc"></div>
+      <div class="confirm-actions">
+        <button class="btn-secondary confirm-cancel" id="confirm-no">Cancel</button>
+        <button class="btn-danger" id="confirm-yes">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       TOAST CONTAINER
+  ════════════════════════════════════ -->
+  <div class="toast-container" id="toast-container"></div>
+
+</div>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
